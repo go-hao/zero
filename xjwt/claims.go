@@ -30,12 +30,12 @@ type TokenClaims struct {
 	jwt.RegisteredClaims
 }
 
-func newTokenClaims(issuer string, subject string, lifetime time.Duration) *TokenClaims {
+func newTokenClaims(issuer string, subject string, lifetimeInSec int64) *TokenClaims {
 	now := time.Now()
 	claims := &TokenClaims{}
 	claims.Issuer = issuer
 	claims.Subject = subject
-	claims.ExpiresAt = jwt.NewNumericDate(now.Add(lifetime))
+	claims.ExpiresAt = jwt.NewNumericDate(now.Add(time.Duration(lifetimeInSec) * time.Second))
 	claims.IssuedAt = jwt.NewNumericDate(now)
 	claims.ID = uuid.New().String()
 

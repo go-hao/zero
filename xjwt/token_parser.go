@@ -25,6 +25,7 @@ func MustNewTokenParser(c TokenParserConf) *TokenParser {
 	if err != nil {
 		log.Fatalf("error: MustNewTokenParser: %s", err.Error())
 	}
+
 	tokenParser.secretKey = secretKey
 
 	return tokenParser
