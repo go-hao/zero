@@ -23,9 +23,7 @@ func newResponse(v interface{}) Response {
 	default:
 		resp.Code = CodeOk
 		resp.Msg = MsgOk
-		if v != nil {
-			resp.Data = v
-		}
+		resp.Data = v
 	}
 
 	return resp
