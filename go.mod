@@ -1,4 +1,4 @@
-module github/go-hao/zero
+module github.com/go-hao/zero
 
 go 1.23.6
 

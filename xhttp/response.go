@@ -1,6 +1,6 @@
 package xhttp
 
-import "github/go-hao/zero/xerrors"
+import "github.com/go-hao/zero/xerrors"
 
 type Response struct {
 	Code int         `json:"code"`
