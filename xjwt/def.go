@@ -13,3 +13,13 @@ const (
 	ES384 Algorithm = "ES384"
 	ES512 Algorithm = "ES512"
 )
+
+const (
+	ClaimsKeyAudience  string = "aud"
+	ClaimsKeyExpiresAt string = "exp"
+	ClaimsKeyId        string = "jti"
+	ClaimsKeyIssuedAt  string = "iat"
+	ClaimsKeyIssuer    string = "iss"
+	ClaimsKeyNotBefore string = "nbf"
+	ClaimsKeySubject   string = "sub"
+)
