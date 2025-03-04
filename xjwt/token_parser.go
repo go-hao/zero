@@ -1,10 +1,7 @@
 package xjwt
 
 import (
-	"errors"
 	"log"
-
-	"github.com/golang-jwt/jwt/v5"
 )
 
 type TokenParserConf struct {
@@ -35,22 +32,21 @@ func (t *TokenParser) ParseAccessTokenForAuth(tokenString string) (*TokenClaims,
 	tokenToParse := getAccessToken(tokenString)
 
 	// parse access token
-	return parseToken(t.algorithm, t.secretKey, tokenToParse)
+	return parseToken(t.algorithm, t.secretKey, tokenToParse, false)
 }
 
 func (t *TokenParser) ParseTokensForRefresh(accessTokenString string, refreshTokenString string) (*TokenClaims, error) {
 	accessTokenToParse := getAccessToken(accessTokenString)
 
 	// parse access token
-	accessTokenClaims, err := parseToken(t.algorithm, t.secretKey, accessTokenToParse)
-
+	accessTokenClaims, err := parseToken(t.algorithm, t.secretKey, accessTokenToParse, true)
 	// access token can be expired
-	if err != nil && !errors.Is(err, jwt.ErrTokenExpired) {
+	if err != nil {
 		return nil, err
 	}
 
 	// parse refresh token
-	_, err = parseToken(t.algorithm, t.secretKey, refreshTokenString)
+	_, err = parseToken(t.algorithm, t.secretKey, refreshTokenString, false)
 	if err != nil {
 		return nil, err
 	}

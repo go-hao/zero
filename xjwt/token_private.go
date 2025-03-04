@@ -1,6 +1,7 @@
 package xjwt
 
 import (
+	"errors"
 	"os"
 	"strings"
 
@@ -60,7 +61,7 @@ func getAccessToken(tokenString string) string {
 	return tokenString
 }
 
-func parseToken(algorithm Algorithm, secretKey interface{}, tokenString string) (*TokenClaims, error) {
+func parseToken(algorithm Algorithm, secretKey interface{}, tokenString string, canExpire bool) (*TokenClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &TokenClaims{},
 		func(token *jwt.Token) (interface{}, error) {
 			return secretKey, nil
@@ -68,13 +69,25 @@ func parseToken(algorithm Algorithm, secretKey interface{}, tokenString string) 
 		jwt.WithValidMethods([]string{string(algorithm)}),
 		jwt.WithExpirationRequired(),
 	)
-	if err != nil {
-		return nil, err
+
+	if canExpire {
+		if err != nil && !errors.Is(err, jwt.ErrTokenExpired) {
+			return nil, err
+		}
+	} else {
+		if err != nil {
+			return nil, err
+		}
+
+		if !token.Valid {
+			return nil, ErrInvalidToken
+		}
 	}
 
-	if claims, ok := token.Claims.(*TokenClaims); ok && token.Valid {
-		return claims, nil
+	claims, ok := token.Claims.(*TokenClaims)
+	if !ok {
+		return nil, jwt.ErrTokenInvalidClaims
 	}
 
-	return nil, jwt.ErrTokenInvalidClaims
+	return claims, nil
 }
