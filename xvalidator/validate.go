@@ -9,7 +9,7 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-func Validate(ctx context.Context, s interface{}) error {
+func Validate(ctx context.Context, s any) error {
 	err := validator.New().StructCtx(ctx, s)
 
 	switch data := s.(type) {

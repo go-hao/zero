@@ -8,7 +8,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func getPrivateKey(algorithm Algorithm, secretKey string, secretKeyPath string) (interface{}, error) {
+func getPrivateKey(algorithm Algorithm, secretKey string, secretKeyPath string) (any, error) {
 	switch algorithm {
 	case RS256, RS384, RS512:
 		key, err := os.ReadFile(secretKeyPath)
@@ -30,7 +30,7 @@ func getPrivateKey(algorithm Algorithm, secretKey string, secretKeyPath string) 
 	}
 }
 
-func getPublicKey(algorithm Algorithm, secretKey string, secretKeyPath string) (interface{}, error) {
+func getPublicKey(algorithm Algorithm, secretKey string, secretKeyPath string) (any, error) {
 	switch algorithm {
 	case RS256, RS384, RS512:
 		key, err := os.ReadFile(secretKeyPath)
@@ -61,9 +61,9 @@ func getAccessToken(tokenString string) string {
 	return tokenString
 }
 
-func parseToken(algorithm Algorithm, secretKey interface{}, tokenString string, canExpire bool) (*TokenClaims, error) {
+func parseToken(algorithm Algorithm, secretKey any, tokenString string, canExpire bool) (*TokenClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &TokenClaims{},
-		func(token *jwt.Token) (interface{}, error) {
+		func(token *jwt.Token) (any, error) {
 			return secretKey, nil
 		},
 		jwt.WithValidMethods([]string{string(algorithm)}),

@@ -12,7 +12,7 @@ type TokenParserConf struct {
 
 type TokenParser struct {
 	algorithm Algorithm
-	secretKey interface{}
+	secretKey any
 }
 
 func MustNewTokenParser(c TokenParserConf) *TokenParser {

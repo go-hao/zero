@@ -16,7 +16,7 @@ type TokenCreatorConf struct {
 
 type TokenCreator struct {
 	algorithm                 Algorithm
-	secretKey                 interface{}
+	secretKey                 any
 	AccessTokenLifetimeInSec  int64
 	RefreshTokenLifetimeInSec int64
 }
