@@ -1,16 +1,26 @@
 package xvalidator
 
 import (
-	"context"
 	"errors"
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/go-playground/validator/v10"
 )
 
-func Validate(ctx context.Context, s any) error {
-	err := validator.New().StructCtx(ctx, s)
+type Validator struct {
+	validate *validator.Validate
+}
+
+func New() *Validator {
+	return &Validator{
+		validate: validator.New(validator.WithRequiredStructEnabled()),
+	}
+}
+
+func (v *Validator) Validate(r *http.Request, s any) error {
+	err := v.validate.StructCtx(r.Context(), s)
 
 	switch data := s.(type) {
 	case Validatable:
