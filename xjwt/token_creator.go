@@ -10,8 +10,8 @@ import (
 
 type TokenCreatorConf struct {
 	Algorithm                 Algorithm `json:",default=HS256"`
-	SecretKey                 string    `json:",optional"`
-	SecretKeyPath             string    `json:",optional"`
+	SecretKey                 string    `json:",omitempty"`
+	SecretKeyPath             string    `json:",omitempty"`
 	AccessTokenLifetimeInSec  int64     `json:",default=3600"`
 	RefreshTokenLifetimeInSec int64     `json:",default=86400"`
 }

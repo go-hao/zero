@@ -8,8 +8,8 @@ import (
 
 type TokenParserConf struct {
 	Algorithm     Algorithm `json:",default=HS256"`
-	SecretKey     string    `json:",optional"`
-	SecretKeyPath string    `json:",optional"`
+	SecretKey     string    `json:",omitempty"`
+	SecretKeyPath string    `json:",omitempty"`
 }
 
 func (c TokenParserConf) Validate() error {
