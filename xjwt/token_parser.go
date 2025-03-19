@@ -3,16 +3,15 @@ package xjwt
 import (
 	"errors"
 	"fmt"
-	"log"
 )
 
-type TokenParserConf struct {
+type TokenParserConfig struct {
 	Algorithm     Algorithm `json:",default=HS256"`
-	SecretKey     string    `json:",omitempty"`
-	SecretKeyPath string    `json:",omitempty"`
+	SecretKey     string    `json:",optional"`
+	SecretKeyPath string    `json:",optional"`
 }
 
-func (c TokenParserConf) Validate() error {
+func (c TokenParserConfig) Validate() error {
 	switch c.Algorithm {
 	case RS256, RS384, RS512, ES256, ES384, ES512:
 		if len(c.SecretKeyPath) == 0 {
@@ -34,12 +33,18 @@ type TokenParser struct {
 	secretKey any
 }
 
-func MustNewTokenParser(c TokenParserConf) *TokenParser {
+func MustNewTokenParser(c TokenParserConfig) *TokenParser {
+	// validate config
+	err := c.Validate()
+	if err != nil {
+		panic(fmt.Sprintf("MustNewTokenParser: %s", err.Error()))
+	}
+
 	tokenParser := &TokenParser{}
 	tokenParser.algorithm = c.Algorithm
 	secretKey, err := getPublicKey(c.Algorithm, c.SecretKey, c.SecretKeyPath)
 	if err != nil {
-		log.Fatalf("error: MustNewTokenParser: %s", err.Error())
+		panic(fmt.Sprintf("MustNewTokenParser: %s", err.Error()))
 	}
 
 	tokenParser.secretKey = secretKey

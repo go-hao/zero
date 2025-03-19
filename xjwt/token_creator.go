@@ -3,20 +3,19 @@ package xjwt
 import (
 	"errors"
 	"fmt"
-	"log"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type TokenCreatorConf struct {
+type TokenCreatorConfig struct {
 	Algorithm                 Algorithm `json:",default=HS256"`
-	SecretKey                 string    `json:",omitempty"`
-	SecretKeyPath             string    `json:",omitempty"`
+	SecretKey                 string    `json:",optional"`
+	SecretKeyPath             string    `json:",optional"`
 	AccessTokenLifetimeInSec  int64     `json:",default=3600"`
 	RefreshTokenLifetimeInSec int64     `json:",default=86400"`
 }
 
-func (c TokenCreatorConf) Validate() error {
+func (c TokenCreatorConfig) Validate() error {
 	switch c.Algorithm {
 	case RS256, RS384, RS512, ES256, ES384, ES512:
 		if len(c.SecretKeyPath) == 0 {
@@ -51,12 +50,18 @@ type Token struct {
 	ExpiresIn int64
 }
 
-func MustNewTokenCreator(c TokenCreatorConf) *TokenCreator {
+func MustNewTokenCreator(c TokenCreatorConfig) *TokenCreator {
+	// validate config
+	err := c.Validate()
+	if err != nil {
+		panic(fmt.Sprintf("MustNewTokenCreator: %s", err.Error()))
+	}
+
 	tokenCreator := &TokenCreator{}
 	tokenCreator.algorithm = c.Algorithm
 	secretKey, err := getPrivateKey(c.Algorithm, c.SecretKey, c.SecretKeyPath)
 	if err != nil {
-		log.Fatalf("error: MustNewTokenCreator: %s", err.Error())
+		panic(fmt.Sprintf("MustNewTokenCreator: %s", err.Error()))
 	}
 
 	tokenCreator.secretKey = secretKey
