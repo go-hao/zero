@@ -6,9 +6,9 @@ import (
 )
 
 type TokenParserConfig struct {
-	Algorithm     Algorithm `json:",default=HS256"`
+	Algorithm     Algorithm `json:",options=HS256|HS384|HS512|RS256|RS384|RS512|ES256|ES384|ES512"`
 	SecretKey     string    `json:",optional"`
-	SecretKeyPath string    `json:",optional"`
+	SecretKeyPath string    `json:",default=./certs/key.pem.pub"`
 }
 
 func (c TokenParserConfig) Validate() error {

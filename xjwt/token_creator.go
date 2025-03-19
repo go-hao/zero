@@ -8,11 +8,11 @@ import (
 )
 
 type TokenCreatorConfig struct {
-	Algorithm                 Algorithm `json:",default=HS256"`
+	Algorithm                 Algorithm `json:",options=HS256|HS384|HS512|RS256|RS384|RS512|ES256|ES384|ES512"`
 	SecretKey                 string    `json:",optional"`
-	SecretKeyPath             string    `json:",optional"`
-	AccessTokenLifetimeInSec  int64     `json:",default=3600"`
-	RefreshTokenLifetimeInSec int64     `json:",default=86400"`
+	SecretKeyPath             string    `json:",default=./certs/key.pem"`
+	AccessTokenLifetimeInSec  int64     `json:",range=(0:86400],default=3600"`
+	RefreshTokenLifetimeInSec int64     `json:",range=(0:31536000],default=86400"`
 }
 
 func (c TokenCreatorConfig) Validate() error {
