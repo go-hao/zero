@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type TokenCreatorConfig struct {
@@ -54,14 +55,16 @@ func MustNewTokenCreator(c TokenCreatorConfig) *TokenCreator {
 	// validate config
 	err := c.Validate()
 	if err != nil {
-		panic(fmt.Sprintf("MustNewTokenCreator: %s", err.Error()))
+		logx.Errorf("MustNewTokenCreator: %v", err)
+		logx.Must(err)
 	}
 
 	tokenCreator := &TokenCreator{}
 	tokenCreator.algorithm = c.Algorithm
 	secretKey, err := getPrivateKey(c.Algorithm, c.SecretKey, c.SecretKeyPath)
 	if err != nil {
-		panic(fmt.Sprintf("MustNewTokenCreator: %s", err.Error()))
+		logx.Errorf("MustNewTokenCreator: %v", err)
+		logx.Must(err)
 	}
 
 	tokenCreator.secretKey = secretKey

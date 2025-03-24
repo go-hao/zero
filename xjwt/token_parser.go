@@ -3,6 +3,8 @@ package xjwt
 import (
 	"errors"
 	"fmt"
+
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type TokenParserConfig struct {
@@ -37,14 +39,16 @@ func MustNewTokenParser(c TokenParserConfig) *TokenParser {
 	// validate config
 	err := c.Validate()
 	if err != nil {
-		panic(fmt.Sprintf("MustNewTokenParser: %s", err.Error()))
+		logx.Errorf("MustNewTokenParser: %v", err)
+		logx.Must(err)
 	}
 
 	tokenParser := &TokenParser{}
 	tokenParser.algorithm = c.Algorithm
 	secretKey, err := getPublicKey(c.Algorithm, c.SecretKey, c.SecretKeyPath)
 	if err != nil {
-		panic(fmt.Sprintf("MustNewTokenParser: %s", err.Error()))
+		logx.Errorf("MustNewTokenParser: %v", err)
+		logx.Must(err)
 	}
 
 	tokenParser.secretKey = secretKey
