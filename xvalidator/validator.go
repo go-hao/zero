@@ -30,6 +30,19 @@ func (v *Validator) Validate(r *http.Request, s any) error {
 	}
 }
 
+// RegisterValidations registers custom validations for struct validator
+func (v *Validator) RegisterValidations(validations map[string]validator.Func) error {
+	// register function validations
+	for k, val := range validations {
+		err := v.validate.RegisterValidation(k, val)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func customError(s Validatable, err error) error {
 	if err == nil {
 		return nil
