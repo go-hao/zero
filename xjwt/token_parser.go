@@ -56,6 +56,19 @@ func MustNewTokenParser(c TokenParserConfig) *TokenParser {
 	return tokenParser
 }
 
+// ParseAccessTokenForClaims returns the access token claims
+//
+// The token can be expired
+func (t *TokenParser) ParseAccessTokenForClaims(tokenString string) (*TokenClaims, error) {
+	tokenToParse := getAccessToken(tokenString)
+
+	// parse access token
+	return parseToken(t.algorithm, t.secretKey, tokenToParse, true)
+}
+
+// ParseAccessTokenForAuth verifies the access token and returns the claims
+//
+// The token cannot be expired
 func (t *TokenParser) ParseAccessTokenForAuth(tokenString string) (*TokenClaims, error) {
 	tokenToParse := getAccessToken(tokenString)
 
@@ -63,6 +76,9 @@ func (t *TokenParser) ParseAccessTokenForAuth(tokenString string) (*TokenClaims,
 	return parseToken(t.algorithm, t.secretKey, tokenToParse, false)
 }
 
+// ParseAccessTokenForRefresh verifies access and refresh token and returns the access token claims
+//
+// The access token can be expired and the refresh token cannot be expired
 func (t *TokenParser) ParseTokensForRefresh(accessTokenString string, refreshTokenString string) (*TokenClaims, error) {
 	accessTokenToParse := getAccessToken(accessTokenString)
 
