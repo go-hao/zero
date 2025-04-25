@@ -1,7 +1,6 @@
 package xjwt
 
 import (
-	"errors"
 	"os"
 	"strings"
 
@@ -70,18 +69,17 @@ func parseToken(algorithm Algorithm, secretKey any, tokenString string, canExpir
 		jwt.WithExpirationRequired(),
 	)
 
-	if canExpire {
-		if err != nil && !errors.Is(err, jwt.ErrTokenExpired) {
-			return nil, err
+	switch err {
+	case jwt.ErrTokenExpired:
+		if !canExpire {
+			return nil, ErrTokenExpired
 		}
-	} else {
-		if err != nil {
-			return nil, err
-		}
-
-		if !token.Valid {
+	case nil:
+		if !canExpire && !token.Valid {
 			return nil, ErrInvalidToken
 		}
+	default:
+		return nil, err
 	}
 
 	claims, ok := token.Claims.(*TokenClaims)

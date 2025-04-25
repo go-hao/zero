@@ -1,5 +1,12 @@
 package xjwt
 
-import "errors"
+import (
+	"errors"
 
-var ErrInvalidToken = errors.New("token is not valid")
+	"github.com/golang-jwt/jwt/v5"
+)
+
+var (
+	ErrInvalidToken = errors.New("token is not valid")
+	ErrTokenExpired = jwt.ErrTokenExpired
+)
