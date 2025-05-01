@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -75,43 +74,9 @@ func MustNewTokenCreator(c TokenCreatorConfig) *TokenCreator {
 }
 
 func (t *TokenCreator) CreateAccessToken(issuer string, subject string) (*Token, error) {
-	// init token
-	token := jwt.New(jwt.GetSigningMethod(string(t.algorithm)))
-
-	// init claims
-	claims := newTokenClaims(issuer, subject, t.AccessTokenLifetimeInSec)
-
-	// add cliams to token
-	token.Claims = claims
-
-	tokenString, err := token.SignedString(t.secretKey)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Token{
-		Value:     tokenString,
-		ExpiresIn: t.AccessTokenLifetimeInSec,
-	}, nil
+	return createToken(issuer, subject, t.AccessTokenLifetimeInSec, t.algorithm, t.secretKey)
 }
 
-func (t *TokenCreator) CreateRefreshToken(issuer string) (*Token, error) {
-	// init token
-	token := jwt.New(jwt.GetSigningMethod(string(t.algorithm)))
-
-	// init claims
-	claims := newTokenClaims(issuer, "", t.RefreshTokenLifetimeInSec)
-
-	// add cliams to token
-	token.Claims = claims
-
-	tokenString, err := token.SignedString(t.secretKey)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Token{
-		Value:     tokenString,
-		ExpiresIn: t.RefreshTokenLifetimeInSec,
-	}, nil
+func (t *TokenCreator) CreateRefreshToken(issuer string, subject string) (*Token, error) {
+	return createToken(issuer, subject, t.RefreshTokenLifetimeInSec, t.algorithm, t.secretKey)
 }

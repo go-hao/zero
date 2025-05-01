@@ -56,44 +56,14 @@ func MustNewTokenParser(c TokenParserConfig) *TokenParser {
 	return tokenParser
 }
 
-// ParseAccessTokenForClaims returns the access token claims
-//
-// The token can be expired
-func (t *TokenParser) ParseAccessTokenForClaims(tokenString string) (*TokenClaims, error) {
+func (t *TokenParser) ParseAccessToken(tokenString string) (*TokenClaims, error) {
 	tokenToParse := getAccessToken(tokenString)
 
 	// parse access token
-	return parseToken(t.algorithm, t.secretKey, tokenToParse, true)
+	return parseToken(t.algorithm, t.secretKey, tokenToParse)
 }
 
-// ParseAccessTokenForAuth verifies the access token and returns the claims
-//
-// The token cannot be expired
-func (t *TokenParser) ParseAccessTokenForAuth(tokenString string) (*TokenClaims, error) {
-	tokenToParse := getAccessToken(tokenString)
-
-	// parse access token
-	return parseToken(t.algorithm, t.secretKey, tokenToParse, false)
-}
-
-// ParseAccessTokenForRefresh verifies access and refresh token and returns the access token claims
-//
-// The access token can be expired and the refresh token cannot be expired
-func (t *TokenParser) ParseTokensForRefresh(accessTokenString string, refreshTokenString string) (*TokenClaims, error) {
-	accessTokenToParse := getAccessToken(accessTokenString)
-
-	// parse access token
-	accessTokenClaims, err := parseToken(t.algorithm, t.secretKey, accessTokenToParse, true)
-	// access token can be expired
-	if err != nil {
-		return nil, err
-	}
-
+func (t *TokenParser) ParseRefreshToken(tokenString string) (*TokenClaims, error) {
 	// parse refresh token
-	_, err = parseToken(t.algorithm, t.secretKey, refreshTokenString, false)
-	if err != nil {
-		return nil, err
-	}
-
-	return accessTokenClaims, nil
+	return parseToken(t.algorithm, t.secretKey, tokenString)
 }

@@ -53,14 +53,14 @@ func getPublicKey(algorithm Algorithm, secretKey string, secretKeyPath string) (
 
 func getAccessToken(tokenString string) string {
 	tokenSplit := strings.Split(tokenString, " ")
-	if len(tokenSplit) == 2 {
+	if len(tokenSplit) >= 2 {
 		return tokenSplit[1]
 	}
 
 	return tokenString
 }
 
-func parseToken(algorithm Algorithm, secretKey any, tokenString string, canExpire bool) (*TokenClaims, error) {
+func parseToken(algorithm Algorithm, secretKey any, tokenString string) (*TokenClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &TokenClaims{},
 		func(token *jwt.Token) (any, error) {
 			return secretKey, nil
@@ -69,17 +69,12 @@ func parseToken(algorithm Algorithm, secretKey any, tokenString string, canExpir
 		jwt.WithExpirationRequired(),
 	)
 
-	switch err {
-	case jwt.ErrTokenExpired:
-		if !canExpire {
-			return nil, ErrTokenExpired
-		}
-	case nil:
-		if !canExpire && !token.Valid {
-			return nil, ErrInvalidToken
-		}
-	default:
+	if err != nil {
 		return nil, err
+	}
+
+	if !token.Valid {
+		return nil, jwt.ErrTokenInvalidClaims
 	}
 
 	claims, ok := token.Claims.(*TokenClaims)
@@ -88,4 +83,25 @@ func parseToken(algorithm Algorithm, secretKey any, tokenString string, canExpir
 	}
 
 	return claims, nil
+}
+
+func createToken(issuer string, subject string, lifetimeInSec int64, algorithm Algorithm, secretKey any) (*Token, error) {
+	// init token
+	token := jwt.New(jwt.GetSigningMethod(string(algorithm)))
+
+	// init claims
+	claims := newTokenClaims(issuer, subject, lifetimeInSec)
+
+	// add cliams to token
+	token.Claims = claims
+
+	tokenString, err := token.SignedString(secretKey)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Token{
+		Value:     tokenString,
+		ExpiresIn: lifetimeInSec,
+	}, nil
 }
