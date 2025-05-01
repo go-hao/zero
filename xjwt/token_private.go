@@ -60,7 +60,7 @@ func getAccessToken(tokenString string) string {
 	return tokenString
 }
 
-func parseToken(algorithm Algorithm, secretKey any, tokenString string) (*TokenClaims, error) {
+func validateAndParseToken(algorithm Algorithm, secretKey any, tokenString string) (*TokenClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &TokenClaims{},
 		func(token *jwt.Token) (any, error) {
 			return secretKey, nil
@@ -74,6 +74,25 @@ func parseToken(algorithm Algorithm, secretKey any, tokenString string) (*TokenC
 	}
 
 	if !token.Valid {
+		return nil, jwt.ErrTokenInvalidClaims
+	}
+
+	claims, ok := token.Claims.(*TokenClaims)
+	if !ok {
+		return nil, jwt.ErrTokenInvalidClaims
+	}
+
+	return claims, nil
+}
+
+func parseToken(algorithm Algorithm, secretKey any, tokenString string) (*TokenClaims, error) {
+	token, _ := jwt.ParseWithClaims(tokenString, &TokenClaims{},
+		func(token *jwt.Token) (any, error) {
+			return secretKey, nil
+		},
+	)
+
+	if token == nil {
 		return nil, jwt.ErrTokenInvalidClaims
 	}
 

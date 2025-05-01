@@ -56,6 +56,18 @@ func MustNewTokenParser(c TokenParserConfig) *TokenParser {
 	return tokenParser
 }
 
+func (t *TokenParser) ValidateAndParseAccessToken(tokenString string) (*TokenClaims, error) {
+	tokenToParse := getAccessToken(tokenString)
+
+	// validate and parse access token
+	return validateAndParseToken(t.algorithm, t.secretKey, tokenToParse)
+}
+
+func (t *TokenParser) ValidateAndParseRefreshToken(tokenString string) (*TokenClaims, error) {
+	// validate and parse refresh token
+	return validateAndParseToken(t.algorithm, t.secretKey, tokenString)
+}
+
 func (t *TokenParser) ParseAccessToken(tokenString string) (*TokenClaims, error) {
 	tokenToParse := getAccessToken(tokenString)
 
